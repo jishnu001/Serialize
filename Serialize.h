@@ -1,3 +1,9 @@
+
+
+#ifndef SERIALIZE_H
+
+#define SERIALIZE_H
+
 #include <vector>
 
 class Serialize{
@@ -43,3 +49,7 @@ public:
 
     
 };
+
+
+
+#endif
