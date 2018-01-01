@@ -5,13 +5,17 @@
 #define SERIALIZE_H
 
 #include <vector>
+#include <map>
+#include <algorithm>
+#include <sstream>
+#include <utility>
 
 class Serialize{
 
 
 public:
     template<typename T, typename A>
-    static void Serialize(std::vector<T,A>& vec, char* buffer)
+    static void serializeVector(std::vector<T,A>& vec, char* buffer)
     {
         char* buf = new char[vec.size() * sizeof(T) + 1];
         buf[vec.size() * sizeof(T) ] = '\0';
@@ -30,7 +34,14 @@ public:
 
     }
 
-
+  template <class key, class value>
+  std::string serializeMap(const std::map<key, value>& v){
+    std::stringstream ss;
+    std::for_each(v.begin(), v.end(), [&ss](const std::pair<key, value>& s){
+            ss.write ((char*)&s, sizeof(std::pair<key,value>));
+        });
+    return ss.str();
+   }
 
 
     template<typename T, typename A>
@@ -46,7 +57,27 @@ public:
             return;
         }
     }
+	
+	
+    template <class key, class value>
+    void deSerializeMap(const std::string& s, std::map<key, value>& v){
+    
+	    std::stringstream ss1;
 
+	    ss1<<s;
+
+	    int pos = 0;
+
+	    while(ss1){
+		char* ar = new char[sizeof(std::pair<key, value>)];
+		ss1.read(ar,(sizeof(std::pair<key, value>)));
+		v.insert(*(reinterpret_cast<std::pair<key, value>*>(ar)));
+		pos+=sizeof(std::pair<key, value>);
+		ss1.seekg(pos);
+		delete[] ar;
+	    }
+    
+    }
     
 };
 
